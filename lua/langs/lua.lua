@@ -1,11 +1,9 @@
--- lua/langs/lua.lua
--- Lua 开发环境配置：语法高亮、LSP、补全、格式化等功能
+-- Lua 开发环境配置
 return {
-  -- Treesitter 高亮与增量选择
+  -- 1. Treesitter 支持
   {
     "nvim-treesitter/nvim-treesitter",
     ft = {"lua"},
-    build = ":TSUpdate",
     opts = {
       ensure_installed = {"lua"},
       highlight = { enable = true },
@@ -13,17 +11,26 @@ return {
     },
   },
 
-  -- Lua LSP (lua-language-server)
+  -- 2. LSP 配置
   {
     "neovim/nvim-lspconfig",
     ft = {"lua"},
-    dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
     config = function()
-      -- 安装与配置 lua-language-server
-      require("mason").setup()
-      require("mason-lspconfig").setup({ ensure_installed = { "lua_ls" } })
-      local nvim_lsp = require("lspconfig")
-      nvim_lsp.lua_ls.setup({
+      local lspconfig = require("lspconfig")
+      local lsp_core = require('core.lsp')
+      
+      -- 导入通用 CMP 配置
+      require('core.cmp')
+      
+      require("mason-lspconfig").setup({ 
+        ensure_installed = { "lua_ls" } 
+      })
+      
+      lspconfig.lua_ls.setup({
         settings = {
           Lua = {
             runtime = { version = 'LuaJIT', path = vim.split(package.path, ';') },
@@ -32,45 +39,32 @@ return {
             telemetry = { enable = false },
           }
         },
-        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+        on_attach = lsp_core.on_attach,
+        capabilities = lsp_core.capabilities,
       })
-    end,
+    end
   },
 
-  -- 自动补全
+  -- 3. 代码格式化 (使用 none-ls 替代 null-ls)
   {
-    "hrsh7th/nvim-cmp",
+    "nvimtools/none-ls.nvim",  -- 替换原 null-ls 插件
     ft = {"lua"},
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-buffer",
-      "hrsh7th/cmp-path",
-      "L3MON4D3/LuaSnip",
+    dependencies = { 
+      "nvim-lua/plenary.nvim",
+      "williamboman/mason.nvim"
     },
     config = function()
-      local cmp = require('cmp')
-      cmp.setup.buffer({
-        snippet = { expand = function(args) require('luasnip').lsp_expand(args.body) end },
-        mapping = cmp.mapping.preset.insert({ ['<C-Space>'] = cmp.mapping.complete(), ['<CR>'] = cmp.mapping.confirm({ select = true }) }),
-        sources = cmp.config.sources({ { name = 'nvim_lsp' }, { name = 'buffer' }, { name = 'path' } }),
+      -- 导入通用 none-ls 配置
+      local none_ls = require("core.none_ls")
+      
+      -- 注册 Lua 相关的格式化工具
+      none_ls.register({
+        none_ls.builtins.formatting.stylua
       })
-    end,
+    end
   },
 
-  -- 代码格式化 (Stylua)
-  {
-    "jose-elias-alvarez/null-ls.nvim",
-    ft = {"lua"},
-    dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-      local null_ls = require('null-ls')
-      null_ls.setup({
-        sources = { null_ls.builtins.formatting.stylua },
-      })
-    end,
-  },
-
-  -- Snippet 支持
+  -- 4. Snippet 支持
   {
     "L3MON4D3/LuaSnip",
     ft = {"lua"},
@@ -79,5 +73,17 @@ return {
       require('luasnip.loaders.from_vscode').lazy_load()
     end,
   },
+
+  -- 5. 确保安装必要工具
+  {
+    "williamboman/mason.nvim",
+    opts = function(_, opts)
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, {
+        "lua-language-server",
+        "stylua"
+      })
+    end
+  }
 }
 
