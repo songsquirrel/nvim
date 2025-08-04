@@ -1,26 +1,54 @@
--- 插件配置格式：与直接写在 lazy.setup 中的单个插件配置完全一致
+-- lua/plugins/nvim-tree.lua
 return {
-  'nvim-tree/nvim-tree.lua',
-  dependencies = { 'nvim-tree/nvim-web-devicons' },
+  "nvim-tree/nvim-tree.lua",
+  dependencies = { "nvim-tree/nvim-web-devicons" },  -- 依赖图标插件
+  cmd = "NvimTreeToggle",  -- 懒加载：只有执行命令时才加载
   keys = {
-    { '<leader>e', '<cmd>NvimTreeToggle<CR>', desc = '切换文件树' },
-    { '<leader>f', '<cmd>NvimTreeFindFile<CR>', desc = '定位当前文件' },
+    { "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "切换文件树" }  -- 快捷键
   },
-  config = function()
-    require('nvim-tree').setup({
-      filters = {
-        -- 过滤掉 Spring Boot 项目中的编译目录
-        custom = { '^target$', '^.git$', '^.idea$' },
+  opts = {
+    -- 基本配置
+    auto_reload_on_write = true,
+    disable_netrw = false,
+    hijack_cursor = false,
+    hijack_netrw = true,
+    hijack_unnamed_buffer_when_opening = false,
+    sort_by = "name",
+    
+    -- 窗口配置
+    view = {
+      adaptive_size = true,
+      width = 30,
+      side = "left",
+      signcolumn = "yes",
+    },
+    
+    -- 渲染配置（图标和缩进）
+    renderer = {
+      indent_markers = {
+        enable = true,  -- 显示缩进线
+        inline_arrows = true,
       },
-      view = {
-        width = 30, -- 侧边栏宽度
+      icons = {
+        webdev_colors = true,
+        git_placement = "before",
       },
-      actions = {
-        open_file = {
-          quit_on_open = false, -- 打开文件后不自动关闭文件树
-        },
-      },
-    })
-  end,
+    },
+    
+    -- 项目根目录检测
+    sync_root_with_cwd = true,
+    respect_buf_cwd = true,
+    
+    -- 自动定位当前文件
+    update_focused_file = {
+      enable = true,
+      update_root = true,
+    },
+    
+    -- 过滤隐藏文件
+    filters = {
+      custom = { "node_modules", ".git" },  -- 隐藏不需要的目录
+    },
+  }
 }
 
