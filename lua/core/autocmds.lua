@@ -25,3 +25,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
   desc = '复制时高亮文本',
 })
+
+-- 配置诊断显示样式
+vim.diagnostic.config({
+  virtual_text = true, -- 代码行尾显示错误提示
+  signs = true, -- 显示行号旁的错误图标
+  underline = true, -- 下划线标记错误代码
+  update_in_insert = false, -- 插入模式不更新诊断
+  severity_sort = true, -- 按严重程度排序诊断
+  float = {
+    border = 'rounded', -- 浮动窗口圆角边框
+    source = 'always', -- 显示错误来源
+    header = '',
+    prefix = '',
+  },
+})

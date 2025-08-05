@@ -16,6 +16,7 @@ local base_plugins = {
   
   -- 图标支持
   { "nvim-tree/nvim-web-devicons" },
+  { "echasnovski/mini.icons", lazy = true },
   
   -- 自动补全核心
   { "hrsh7th/nvim-cmp" },

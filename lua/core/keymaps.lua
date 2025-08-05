@@ -17,3 +17,10 @@ vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = '切换到右窗口' })
 
 -- 取消搜索高亮
 vim.keymap.set('n', '<ESC>', '<cmd>nohlsearch<CR>', { desc = '取消搜索高亮' })
+
+
+-- 添加诊断快捷键（手动查看详细错误）
+vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = '显示当前行错误详情' })
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = '跳转到上一个错误' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = '跳转到下一个错误' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = '将所有错误添加到位置列表' })
